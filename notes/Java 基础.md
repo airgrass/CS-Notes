@@ -1,7 +1,8 @@
 <!-- GFM-TOC -->
-* [一、数据类型](#一数据类型)
-    * [基本类型](#基本类型)
+* [一、数据类型](#数据类型)
     * [包装类型](#包装类型)
+    * [字面值](#字面值)
+    * [基本数据类型转换](#基本数据类型转换)
     * [缓存池](#缓存池)
 * [二、String](#二string)
     * [概览](#概览)
@@ -41,22 +42,32 @@
 
 
 # 一、数据类型
+- 基本数据类型(8种)
+   - 数值型
+      - 整型：byte(8), short(16), int(32), long(64)
+      - 浮点型：float(32), double(64)
+   - 字符型: char(16)
+   - 布尔型: boolean(\~)
+- 引用数据类型
+   - 数组(字符串)
+   - 类(class)
+   - 接口(interface)
+   - 枚举(enum)
+   - 注解(annotation)
+   
 
-## 基本类型
-
-- byte/8
-- char/16
-- short/16
-- int/32
-- float/32
-- long/64
-- double/64
-- boolean/\~
-
-boolean 只有两个值：true、false，可以使用 1 bit 来存储，但是具体大小没有明确规定。JVM 会在编译时期将 boolean 类型的数据转换为 int，使用 1 来表示 true，0 表示 false。JVM 支持 boolean 数组，但是是通过读写 byte 数组来实现的。
+1. boolean 只有两个值：true、false，可以使用 1 bit 来存储，但是具体大小没有明确规定。JVM 会在编译时期将 boolean 类型的数据转换为 int，使用 1 来表示 true，0 表示 false。JVM 支持 boolean 数组，但是是通过读写 byte 数组来实现的。
 
 - [Primitive Data Types](https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html)
 - [The Java® Virtual Machine Specification](https://docs.oracle.com/javase/specs/jvms/se8/jvms8.pdf)
+
+2. 浮点型数据的默认是double类型
+
+3. 表示范围：
+- byte：-2^7\~2^7-1，-128\~127
+- int：-2^31\~2^31-1，-2,147,483,648\~2,147,483,647
+
+4. null是一种特殊的引用类型
 
 ## 包装类型
 
@@ -68,6 +79,57 @@ int y = x;         // 拆箱 调用了 X.intValue()
 ```
 
 - [Autoboxing and Unboxing](https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html)
+
+基本类型的优势：数据存储相对简单，运算效率比较高。\
+包装类的优势：满足了java一切皆是对象的思想，比如集合的元素必须是对象类型；提供实用的静态属性和方法，如`Integer.MIN_VALUE`和`Integer.MAX_VALUE`
+
+## 字面值
+在Java源代码中，字面值用于表示固定的值（fixed value）。数值型的字面值是最常见的，字符串字面值可以算是一种，当然也可以把特殊的null当做字面值。字面值大体上可以分为整型字面值、浮点字面值、字符和字符串字面值、特殊字面值。
+
+- 整型字面值：整型字面值可以用10、16、8、2进制来表示，2、8、16进制的表示分别在最前面加上0B（0b）、0、0X（0x）即可.
+- 浮点型字面值：分为float字面值和double字面值，默认是double，如果在小数后面加上F或者f，则表示这是个float字面值。另外，浮点字面值支持科学技术法表示。
+- 字符字面值：Java中字符字面值用单引号括起来，不能直接输入的字符，可以使用转义字符，如‘\n’为换行字符。也可以使用八进制或者十六进制表示字符，八进制使用反斜杠加3位数字表示，例如'\141'表示字母a。十六进制使用\u加上4为十六进制的数表示，如'\u0061'表示字符a。
+- 字符串字面值：字符串字面值则使用双引号，字符串字面值中同样可以包含字符字面值中的转义字符序列。字符串必须位于同一行或者使用+运算符，因为java没有续行转义序列。
+- 特殊字面值：null，还有一种特殊的class literal，用type name加上.class表示,例如String.class。
+
+## 基本数据类型转换
+1. 自动转换
+   - 精度小的数据转换为精度更高的数据时`double a = 2.1f`
+   - 表达式的自动数据类型提升：所有的byte,short,char型的值将被提升为int型；其他遵循跟随精度最高的原则进行转换。
+   - 自动装箱与拆箱：编译器会在自动装箱过程调用 valueOf() 方法，因此多个值相同且值在缓存池范围内的 Integer 实例使用自动装箱来创建，那么就会引用相同的对象。
+      ```java
+      Integer m = 123; //自动装箱
+      Integer n = 123;
+      System.out.println(m == n); // true
+      int a = m; //自动拆箱
+      ```
+2. 强制转换  
+将"大"数据转换为"小"数据时，你可以使用强制类型转换。即你必须采用下面这种语句格式：`int n=(int)3.14159/2`;可以想象，这种转换肯定可能会导致溢出或精度的下降。
+      
+3. 数值类型间的转换      
+而在各个包装类中，总有形为`××Value()`的方法，来得到其对应的简单类型数据。利用这种方法，也可以实现不同数值型变量间的转换，例如，对于一个双精度实型类，`intValue()`可以得到其对应的整型变量，而`doubleValue()`可以得到其对应的双精度实型变量。
+
+4. 字符串与其他类型的转换
+   - 其它类型向字符串的转换
+      - 调用类的串转换方法:`X.toString()`;
+      - 自动转换:X+"";
+      - 使用`String`的方法:`String.volueOf(X)`;
+   - 字符串作为值,向其它类型的转换
+      - 先转换成相应的封装器实例,再调用对应的方法转换成其它类型\
+         例如，字符中"32.1"转换double型的值的格式为:`new Float("32.1").doubleValue()`。也可以用:`Double.valueOf("32.1").doubleValue()`
+      - 静态`parseXXX`方法
+         ```
+         String s = "1";
+         byte b = Byte.parseByte( s );
+         short t = Short.parseShort( s );
+         int i = Integer.parseInt( s );
+         long l = Long.parseLong( s );
+         Float f = Float.parseFloat( s );
+         Double d = Double.parseDouble( s );
+         ```
+      - `Character`的`getNumericValue(char ch)`方法
+      
+[cnblogs：java基本数据类型的总结](https://www.cnblogs.com/doit8791/archive/2012/05/25/2517448.html)
 
 ## 缓存池
 
@@ -130,13 +192,12 @@ static {
 ```
 
 编译器会在自动装箱过程调用 valueOf() 方法，因此多个值相同且值在缓存池范围内的 Integer 实例使用自动装箱来创建，那么就会引用相同的对象。
-
 ```java
-Integer m = 123;
+Integer m = 123; //自动装箱
 Integer n = 123;
 System.out.println(m == n); // true
 ```
-
+      
 基本类型对应的缓冲池如下：
 
 - boolean values true and false
